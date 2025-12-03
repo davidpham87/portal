@@ -57,3 +57,12 @@
       (on-close session))
     (on-pong    [_ _socket _data])
     (on-error   [_ _socket _throwable])))
+
+(defn connect
+  "Connect to a remote runtime via postMessage.
+  port can be a window, worker, or port."
+  [session port]
+  #?(:cljs
+     (do
+       (on-open session #(.postMessage port %))
+       (set! (.-onmessage port) #(on-receive session (.-data %))))))
